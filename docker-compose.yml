@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  # MongoDB服务
+  mongo:
+    image: mongo:latest
+    container_name: nestjs_mongo
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_server
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: nest-db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3306:3306"
+  # Redis服务
+  redis:
+    image: redis:latest
+    container_name: nestjs_redis
+    ports:
+      - "6379:6379"
+
+  # NestJS应用服务
+  app:
+    build: .
+    container_name: nestjs_app
+    ports:
+      - "3000:3000"  # 替换为您的实际端口映射
+    depends_on:
+      - mongo
+      - redis
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/mydatabase
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+volumes:
+  mongodb_data:
